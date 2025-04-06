@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tlscert-server
+  namespace: tlscert
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tlscert-server
+  namespace: tlscert
+rules:
+  - apiGroups: ["cert-manager.io"]
+    resources: ["certificates"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["secrets"] # TODO: Probably keep the certs in a dedicated namespace
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tlscert-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tlscert-server
+subjects:
+  - kind: ServiceAccount
+    name: tlscert-server

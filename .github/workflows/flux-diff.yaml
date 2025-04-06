@@ -1,0 +1,41 @@
+---
+name: "Flux Diff"
+
+on:
+  pull_request:
+    paths: ["kubernetes/**", "templates/kubernetes/**", ".github/workflows/flux-diff.yaml"]
+
+jobs:
+  flux-diff:
+    name: Flux Diff
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+    strategy:
+      matrix:
+        resource: ["helmrelease", "kustomization"]
+    steps:
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@main
+
+      - name: Diff Resources
+        uses: allenporter/flux-local/action/diff@23b8f4e593254e34b2913728007c419b52789382 # 7.3.0
+        id: diff
+        with:
+          path: "./kubernetes"
+          live-branch: "${{ github.event.pull_request.base.ref }}"
+          resource: "${{ matrix.resource }}"
+          skip-crds: "false"
+
+      - if: ${{ steps.diff.outputs.diff != '' }}
+        name: Add comment
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
+        with:
+          message-id: "${{ github.event.pull_request.number }}/${{ matrix.path }}/${{ matrix.resource }}"
+          message-failure: Diff was not successful
+          message: |
+            ```diff
+            ${{ steps.diff.outputs.diff }}
+            ```

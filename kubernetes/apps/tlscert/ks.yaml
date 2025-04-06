@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps-tlscert-certificates
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infra-network-cert-manager
+    - name: infra-network-cert-manager-issuers
+  path: ./kubernetes/apps/tlscert/certificates
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: tlscert-kubernetes
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps-tlscert-server
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: apps-tlscert-certificates
+    - name: infra-network-ingress-nginx
+  path: ./kubernetes/apps/tlscert/server
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: tlscert-kubernetes
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m

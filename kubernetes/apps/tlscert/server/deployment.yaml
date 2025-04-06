@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tlscert-server
+  namespace: tlscert
+  labels:
+    app: tlscert-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tlscert-server
+  template:
+    metadata:
+      name: tlscert-server
+      labels:
+        app: tlscert-server
+    spec:
+      serviceAccountName: tlscert-server
+      containers:
+        - name: tlscert-server
+          image: ghcr.io/tlscert/server:main
+          imagePullPolicy: Always
+          ports:
+            - name: grpc
+              containerPort: 50051
+      restartPolicy: Always
+      

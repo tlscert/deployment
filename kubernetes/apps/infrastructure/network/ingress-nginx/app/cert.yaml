@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tlscert.dev-wildcard
+  namespace: network
+spec:
+  dnsNames:
+    - 'tlscert.dev'
+    - '*.tlscert.dev'
+  secretName: tlscert-wildcard
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+    group: cert-manager.io

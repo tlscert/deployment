@@ -1,0 +1,10 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSetInputProvider
+metadata:
+  name: tlscert-github-branches
+  namespace: tlscert
+spec:
+  type: GitHubBranch
+  url: https://github.com/tlscert/tlscert
+  filter:
+    includeBranch: "^main$"

@@ -5,3 +5,5 @@ resources:
   - ingress-nginx.yaml
   - jetstack.yaml
   - external-dns.yaml
+  - controlplaneio.yaml
+  - bjw-s.yaml

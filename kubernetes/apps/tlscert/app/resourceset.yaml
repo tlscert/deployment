@@ -1,0 +1,59 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: tlscert-prod
+  namespace: tlscert
+spec:
+  inputsFrom:
+    - apiVersion: fluxcd.controlplane.io/v1
+      kind: ResourceSetInputProvider
+      name: tlscert-github-branches
+  resources:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata:
+        name: tlscert-prod
+        namespace: tlscert
+      spec:
+        interval: 5m
+        timeout: 20m
+        chart:
+          spec:
+            chart: app-template
+            version: 3.7.3
+            sourceRef:
+              kind: HelmRepository
+              name: bjw-s
+              namespace: flux-system
+            interval: 1m
+        values:
+          controllers:
+            main:
+              strategy: RollingUpdate
+              containers:
+                main:
+                  image:
+                    repository: ghcr.io/tlscert/server
+                    tag: commit-<< inputs.sha >>
+                  # TODO: set pool
+                  # args: []
+          serviceAccount:
+            name: tlscert
+          service:
+            main:
+              controller: main
+              ports:
+                http:
+                  port: 8080
+                grpc:
+                  port: 50051
+          ingress:
+            backend:
+              className: nginx
+              hosts:
+                - host: api.tlscert.dev
+                  paths:
+                    - path: /
+                      service:
+                        identifier: main
+                        port: grpc

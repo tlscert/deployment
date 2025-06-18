@@ -1,6 +1,6 @@
 [tools]
 flux2 = "latest"
-kubectl = "1.32.3"
+kubectl = "1.33.2"
 
 [env]
 KUBECONFIG = "{{config_root}}/.kubeconfig"

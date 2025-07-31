@@ -43,8 +43,6 @@ spec:
             main:
               controller: main
               ports:
-                http:
-                  port: 8080
                 grpc:
                   port: 50051
           ingress:
